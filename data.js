@@ -1,11 +1,10 @@
 const mysql     = require('mysql');
 
 const db = mysql.createConnection({
-  host     : 'ddatabase-1.cyhxghdtjrvc.us-west-2.rds.amazonaws.com',
-  port     : 3306,
-  user     : 'admin',
-  password : 'password',
-  database : 'todoapp'
+  host     : '',
+  user     : '',
+  password : '',
+  database : ''
 });
 
 db.connect((err) => {
