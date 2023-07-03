@@ -1,6 +1,4 @@
 const express = require('express')
-const path = require('path')
-const {notes} = require('./data')
 const bodyParser = require('body-parser');
 const {adder, getter, deleteNoteById, updateNoteById, idGetter} = require('./tools')
 //const auth = require('./authenticate')
@@ -22,11 +20,11 @@ app.post('/', adder, (req, res) => {
   });
   
 app.delete('/:id', deleteNoteById, (req, res) => {
-    res.status(200).json(notes);
+    
   });  
 
 app.put('/:id', updateNoteById, (req, res) => {
-    res.status(200).json(notes);
+    
   });  
 
 app.all('*', (req,res) => {

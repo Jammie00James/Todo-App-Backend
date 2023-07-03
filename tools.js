@@ -1,9 +1,9 @@
-const {notes, db} = require('./data')
+const db = require('./data')
 
 //const
 //dbconnect;
 
-const getter = (req, res) =>{
+const getter = (req, res, next) =>{
   console.log(req.query)
   const {search} = req.query
   if(search){ 
@@ -25,6 +25,7 @@ const getter = (req, res) =>{
     res.status(200).json((results));
    });
   }
+  next()
 }
 
 const idGetter = (req,res,next) =>{
@@ -38,7 +39,7 @@ const idGetter = (req,res,next) =>{
  });
 }
 
-const adder = (req,res) =>{
+const adder = (req,res, next) =>{
     let { title, body } = req.body;
     console.log(req.body)
     if (!title && !body) {
@@ -62,17 +63,27 @@ const adder = (req,res) =>{
       res.status(200).json((results));
       });
     })
+
+  next()
 }
 
 
 const deleteNoteById = (req,res,next) => {
-    const index = notes.findIndex(note => note.id === Number(req.params.id));
-    if (index !== -1) {
-      notes.splice(index, 1);
-      console.log('Delete Success') // Deletion successful
-    }else{
-        console.log("Delete failed")
+  const query = 'DELETE FROM notes WHERE id = ?';
+  db.query(query, req.params.id, (err, result) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      return;
     }
+    console.log('Deleted')
+    const sql = 'SELECT * FROM notes';
+    db.query(sql, (err, results) => {
+    if (err) {
+      return console.error('Error executing query:', err);
+    }
+    res.status(200).json((results));
+   });
+  })
     next()
   }
 
@@ -86,13 +97,19 @@ const deleteNoteById = (req,res,next) => {
     }else if(!body){
         body = ''
     }
-    const index = notes.findIndex(note => note.id === Number(req.params.id));
-    if (index !== -1) {
-      notes[index] = {...notes[index], ...{title, body}}
-      console.log('Update Success') // Deletion successful
-    }else{
-        console.log("Update failed")
-    }
+    const sql = 'UPDATE notes SET title = ?, body = ? WHERE id = ?';
+    db.query(sql,[title, body, req.params.id], (err, results) => {
+      if (err) {
+        return console.error('Error executing query:', err);
+      }
+      const query = 'SELECT * FROM notes';
+      db.query(query, (err, results) => {
+        if (err) {
+          return console.error('Error executing query:', err);
+        }
+        res.status(200).json((results));
+      });
+    });
     next()
   }  
 module.exports = {adder,deleteNoteById, updateNoteById, getter, idGetter}
