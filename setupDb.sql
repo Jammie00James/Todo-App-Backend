@@ -1,7 +1,18 @@
-CREATE TABLE notes(
-    id INT AUTO_INCREMENT PRIMARY KEY, 
-    title VARCHAR(50) NOT NULL,
-    body VARCHAR(1000) NOT NULL
+-- Create the Users table
+CREATE TABLE Users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255),
+  password VARCHAR(255) NOT NULL,
+  name VARCHAR(255)
 );
 
-INSERT INTO notes (title, body) VALUES ('John Doe', 'Sample notes');
+-- Create the Notes table
+CREATE TABLE Notes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  body TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES Users(id)
+);
