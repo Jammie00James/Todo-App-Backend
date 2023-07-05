@@ -1,5 +1,6 @@
 const db = require('./data')
-
+const jwt = require('jsonwebtoken')
+const secretKey = 'yourSecretKey';
 //const
 //dbconnect;
 
@@ -10,7 +11,7 @@ const authenticateToken = (req, res, next) =>{
     // Verify the token
     jwt.verify(token, secretKey, (err, decoded) => {
       if (err) {
-        res.status(403).json({ error: 'Invalid token' });
+        return res.status(403).json({ error: 'Invalid token' });
       } else {
         // Store the decoded information in the request object for further use
         req.user = decoded;
@@ -18,36 +19,43 @@ const authenticateToken = (req, res, next) =>{
       }
     });
   } else {
-    res.status(401).json({ error: 'No token provided' });
+    return res.status(401).json({ error: 'No token provided' });
   }
-
 }
 
 
 
 const getter = (req, res, next) =>{
-  console.log(req.query)
-  const {search} = req.query
-  if(search){ 
-    const query = 'SELECT * FROM notes WHERE title LIKE ?';
-    db.query(query, [`${search}%`], (err, results) => {
-      if (err) {
-        console.error('Error executing query:', err);
-        return;
-      }
-      res.status(200).json((results));
-      return;
-    })
-  }else{
-    const query = 'SELECT * FROM notes';
-    db.query(query, (err, results) => {
+  const sql = 'SELECT id,name FROM Users WHERE email = ?';
+  db.query(sql, req.user.email, (err, results) => {
     if (err) {
-      return console.error('Error executing query:', err);
+      return console.log(err);
     }
-    res.status(200).json((results));
-   });
-  }
-  next()
+    if (results.length === 0) {
+      return console.log("no user found");
+    }
+    const userId = results[0].id;
+    const {search} = req.query
+    if(search){ 
+      const query = 'SELECT * FROM Notes WHERE title LIKE ? and user_id = ?';
+      db.query(query, [`${search}%`,userId], (err, results) => {
+        if (err) {
+          console.error('Error executing query:', err);
+          return;
+        }
+        res.status(200).json((results));
+        return;
+      })
+    }else{
+      const query = 'SELECT * FROM Notes WHERE user_id = ?';
+      db.query(query, userId, (err, results) => {
+        if (err) {
+          return console.error('Error executing query:', err);
+        }
+        res.status(200).json((results));
+      });
+    }
+  });
 }
 
 const idGetter = (req,res,next) =>{
@@ -134,4 +142,4 @@ const deleteNoteById = (req,res,next) => {
     });
     next()
   }  
-module.exports = {adder,deleteNoteById, updateNoteById, getter, idGetter}
+module.exports = {adder,deleteNoteById, updateNoteById, getter, idGetter, authenticateToken}

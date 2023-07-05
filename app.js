@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser');
-const {adder, getter, deleteNoteById, updateNoteById, idGetter} = require('./tools')
+const {adder, getter, deleteNoteById, updateNoteById, idGetter, authenticateToken} = require('./tools')
 
 
 const app = express()
@@ -8,19 +8,19 @@ const app = express()
 app.use(bodyParser.json());
 app.use('/auth', require('./routes/auth'));
 app.use(express.urlencoded({extended: false}))
-app.use(express.json)
+app.use(express.json())
 
-app.get('/',getter,(req,res) => {   
+app.get('/', authenticateToken, getter,(req,res) => {   
 })
-app.get('/:id', idGetter, (req,res) => {
+app.get('/:id', authenticateToken, idGetter, (req,res) => {
 })
-app.post('/', adder, (req, res) => {
+app.post('/',authenticateToken, adder, (req, res) => {
 });  
-app.delete('/:id', deleteNoteById, (req, res) => {    
+app.delete('/:id',authenticateToken, deleteNoteById, (req, res) => {    
 });  
-app.put('/:id', updateNoteById, (req, res) => {  
+app.put('/:id',authenticateToken, updateNoteById, (req, res) => {  
 });  
-app.all('*', (req,res) => {
+app.all('*',authenticateToken, (req,res) => {
   res.status(404).send('Page not Found')
 })
 
