@@ -3,6 +3,28 @@ const db = require('./data')
 //const
 //dbconnect;
 
+const authenticateToken = (req, res, next) =>{
+  const token = req.headers['authorization'];
+
+  if (token) {
+    // Verify the token
+    jwt.verify(token, secretKey, (err, decoded) => {
+      if (err) {
+        res.status(403).json({ error: 'Invalid token' });
+      } else {
+        // Store the decoded information in the request object for further use
+        req.user = decoded;
+        next();
+      }
+    });
+  } else {
+    res.status(401).json({ error: 'No token provided' });
+  }
+
+}
+
+
+
 const getter = (req, res, next) =>{
   console.log(req.query)
   const {search} = req.query
