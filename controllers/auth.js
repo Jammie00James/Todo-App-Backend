@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const db = require('../data')
+const dotenv = require('dotenv')
 
-const secretKey = 'yourSecretKey';
+dotenv.config({path:'../.env'})
 
 exports.register = (req,res) => {
     const { name, email, password} = req.body
@@ -47,7 +48,7 @@ exports.login = (req,res) => {
                   res.status(401).json({ error: 'Invalid username or password' });
                 } else {
                   // Create a JWT token
-                  const token = jwt.sign({ email: user.email }, secretKey);
+                  const token = jwt.sign({ email: user.email }, process.env.SECRET_KEY);
             
                   // Send the token back to the client
                   res.json({ token });
