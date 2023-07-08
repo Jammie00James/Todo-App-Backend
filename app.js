@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const {adder, getter, deleteNoteById, updateNoteById, idGetter, authenticateToken} = require('./tools')
 
 
@@ -9,6 +10,7 @@ app.use(bodyParser.json());
 app.use('/auth', require('./routes/auth'));
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
+app.use(cookieParser())
 
 app.get('/', authenticateToken, getter,(req,res) => {   
 })

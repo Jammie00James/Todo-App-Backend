@@ -1,11 +1,12 @@
 const db = require('./data')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
+const cookieParser = require('cookie-parser');
 
 dotenv.config({path:'./.env'})
 
 const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization'];
+  const token = req.cookies.jwt;
 
   if (token) {
     // Verify the token
